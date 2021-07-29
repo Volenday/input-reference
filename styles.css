@@ -1,3 +1,6 @@
+* {
+	box-sizing: border-box;
+}
 .ant-form-item-label {
 	line-height: 1 !important;
 	width: 100% !important;
@@ -14,4 +17,8 @@
 
 .ant-form-vertical .ant-form-item {
 	margin-bottom: 0px;
+}
+
+.ant-input.ant-input-sm {
+	height: 24px !important;
 }
