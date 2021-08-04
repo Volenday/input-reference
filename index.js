@@ -89,6 +89,7 @@ export default ({
 					{allowSearch && (
 						<Col span={24} style={{ paddingRight: '0px !important' }}>
 							<Input.Search
+								disabled={disabled}
 								size="small"
 								placeholder="Search.."
 								onSearch={e => handleSearch(e)}
@@ -98,11 +99,13 @@ export default ({
 					)}
 					<Col span={24} className="listWrapper" style={{ height }}>
 						<List
+							disabled={disabled}
 							itemLayout="horizontal"
 							dataSource={listOptions}
 							renderItem={d => (
 								<List.Item style={{ paddingTop: 3, paddingBottom: 3 }}>
 									<Checkbox
+										disabled={disabled}
 										className="table-font-size"
 										disabled={
 											disabledItems ? (disabledItems.includes(d.value) ? true : false) : false
