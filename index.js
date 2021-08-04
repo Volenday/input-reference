@@ -22,6 +22,7 @@ export default ({
 	listComponentLimit = 'All',
 	loading = false,
 	multiple,
+	onBlur,
 	onChange,
 	placeholder = '',
 	required = false,
@@ -63,6 +64,7 @@ export default ({
 				filterOption={(input, { props }) => props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
 				loading={loading}
 				mode={multiple ? 'multiple' : 'default'}
+				onBlur={onBlur}
 				onChange={e => onChange({ target: { name: id, value: e } }, id, e)}
 				optionFilterProp="children"
 				placeholder={placeholder || label || id}
