@@ -55,7 +55,7 @@ export default ({
 
 	useEffect(() => {
 		handleSearch();
-	}, []);
+	}, [JSON.stringify(options)]);
 
 	const renderSelect = () => {
 		return (
