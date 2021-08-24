@@ -7,7 +7,7 @@ const browser = typeof window !== 'undefined' ? true : false;
 
 if (browser) require('./styles.css');
 
-export default ({
+const InputReference = ({
 	allowSearch = true,
 	children,
 	disabled = false,
@@ -50,7 +50,7 @@ export default ({
 			const newOptions = options.filter(d => d.label.match(new RegExp(val, 'i')));
 			setListOptions(newOptions);
 		},
-		[JSON.stringify(listOptions)]
+		[JSON.stringify(options), JSON.stringify(listOptions)]
 	);
 
 	useEffect(() => {
@@ -99,9 +99,10 @@ export default ({
 					)}
 					<Col span={24} className="listWrapper" style={{ height }}>
 						<List
+							dataSource={listOptions}
 							disabled={disabled}
 							itemLayout="horizontal"
-							dataSource={listOptions}
+							loading={loading}
 							renderItem={d => (
 								<List.Item style={{ paddingTop: 3, paddingBottom: 3 }}>
 									<Checkbox
@@ -205,3 +206,5 @@ export default ({
 		</Form.Item>
 	);
 };
+
+export default InputReference;
