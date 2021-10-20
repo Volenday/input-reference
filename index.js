@@ -8,6 +8,7 @@ const browser = typeof window !== 'undefined' ? true : false;
 if (browser) require('./styles.css');
 
 const InputReference = ({
+	allowClear = false,
 	allowSearch = true,
 	children,
 	disabled = false,
@@ -24,6 +25,7 @@ const InputReference = ({
 	multiple,
 	onBlur,
 	onChange,
+	onClear,
 	placeholder = '',
 	required = false,
 	showManageButton = false,
@@ -60,12 +62,14 @@ const InputReference = ({
 	const renderSelect = () => {
 		return (
 			<Select
+				allowClear={allowClear}
 				disabled={disabled}
 				filterOption={(input, { props }) => props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
 				loading={loading}
 				mode={multiple ? 'multiple' : 'default'}
 				onBlur={onBlur}
 				onChange={e => onChange({ target: { name: id, value: e } }, id, e)}
+				onClear={onClear}
 				optionFilterProp="children"
 				placeholder={placeholder || label || id}
 				showSearch
