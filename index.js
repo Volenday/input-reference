@@ -35,6 +35,7 @@ const InputReference = ({
 	relatedEntityModalClose,
 	type = 'dropdown'
 }) => {
+	const originalOptions = listComponentLimit === 'All' ? options : options.slice(0, listComponentLimit);
 	const [listOptions, setListOptions] = useState([]);
 	const [isDrawerVisible, setIsDrawerVisible] = useState(false);
 
@@ -45,8 +46,8 @@ const InputReference = ({
 					listComponentLimit === 'All'
 						? options
 						: uniq([
-								...options.slice(0, listComponentLimit),
-								...(value ? options.filter(d => value.includes(d.value)) : [])
+								...(value ? options.filter(d => value.includes(d.value)) : []),
+								...options.slice(0, listComponentLimit)
 						  ])
 				);
 			const newOptions = options.filter(d => d.label.match(new RegExp(val, 'i')));
@@ -107,7 +108,7 @@ const InputReference = ({
 							disabled={disabled}
 							itemLayout="horizontal"
 							loading={loading}
-							renderItem={d => (
+							renderItem={(d, index) => (
 								<List.Item style={{ paddingTop: 3, paddingBottom: 3 }}>
 									<Checkbox
 										disabled={disabled}
@@ -116,7 +117,7 @@ const InputReference = ({
 											disabledItems ? (disabledItems.includes(d.value) ? true : false) : false
 										}
 										style={{ fontSize: '8pt' }}
-										onChange={e => {
+										onChange={async e => {
 											const { checked, value: newValue } = e.target;
 
 											const finalValue = checked
@@ -127,7 +128,28 @@ const InputReference = ({
 												? value.filter(d => d !== newValue)
 												: '';
 
-											onChange({ target: { name: id, value: finalValue } }, id, finalValue);
+											await onChange({ target: { name: id, value: finalValue } }, id, finalValue);
+
+											if (
+												(!multiple && !checked && value) ||
+												(multiple && !checked && value.length === 1)
+											) {
+												//temporary fix for delay form value
+												setListOptions(originalOptions); //first 10 default options
+											} else {
+												if (!multiple) {
+													[listOptions[0], listOptions[index]] = [
+														listOptions[index],
+														listOptions[0]
+													];
+												} else {
+													if (checked) {
+														const selectedItem = listOptions[index];
+														listOptions.splice(index, 1);
+														listOptions.splice(0, 0, selectedItem);
+													}
+												}
+											}
 										}}
 										value={d.value}
 										checked={value ? value.includes(d.value) : false}>
