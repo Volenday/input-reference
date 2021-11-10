@@ -117,7 +117,7 @@ const InputReference = ({
 											disabledItems ? (disabledItems.includes(d.value) ? true : false) : false
 										}
 										style={{ fontSize: '8pt' }}
-										onChange={async e => {
+										onChange={e => {
 											const { checked, value: newValue } = e.target;
 
 											const finalValue = checked
@@ -128,7 +128,7 @@ const InputReference = ({
 												? value.filter(d => d !== newValue)
 												: '';
 
-											await onChange({ target: { name: id, value: finalValue } }, id, finalValue);
+											onChange({ target: { name: id, value: finalValue } }, id, finalValue);
 
 											if (
 												(!multiple && !checked && value) ||
