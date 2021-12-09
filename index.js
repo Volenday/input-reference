@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Checkbox, Col, Form, Input, List, Row, Select, Tooltip } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { uniq } from 'lodash';
@@ -38,20 +38,25 @@ const InputReference = ({
 	const originalOptions = listComponentLimit === 'All' ? options : options.slice(0, listComponentLimit);
 	const [listOptions, setListOptions] = useState([]);
 	const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+	let timeout = useRef(null);
 
 	const handleSearch = useCallback(
 		(val = '') => {
-			if (!val)
-				return setListOptions(
-					listComponentLimit === 'All'
-						? options
-						: uniq([
-								...(value ? options.filter(d => value.includes(d.value)) : []),
-								...options.slice(0, listComponentLimit)
-						  ])
-				);
-			const newOptions = options.filter(d => d.label.match(new RegExp(val, 'i')));
-			setListOptions(newOptions);
+			if (timeout) clearTimeout(timeout);
+			timeout = setTimeout(() => {
+				if (!val)
+					return setListOptions(
+						listComponentLimit === 'All'
+							? options
+							: uniq([
+									...(value ? options.filter(d => value.includes(d.value)) : []),
+									...options.slice(0, listComponentLimit)
+							  ])
+					);
+
+				const newOptions = options.filter(d => d.label.match(new RegExp(val, 'i')));
+				setListOptions(newOptions);
+			}, 500);
 		},
 		[JSON.stringify(options), JSON.stringify(listOptions)]
 	);
