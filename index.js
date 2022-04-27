@@ -38,32 +38,77 @@ const InputReference = ({
 	const originalOptions = listComponentLimit === 'All' ? options : options.slice(0, listComponentLimit);
 	const [listOptions, setListOptions] = useState([]);
 	const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+	const [allSelectedValues, setAllSelectedValues] = useState([]);
+	const [searchKey, setSearchKey] = useState('');
 	let timeout = useRef(null);
 
 	const handleSearch = useCallback(
 		(val = '') => {
 			if (timeout) clearTimeout(timeout);
+			setSearchKey(val);
+			const selectedItems = multiple ? allSelectedValues : [];
+
 			timeout = setTimeout(() => {
-				if (!val)
+				if (!val) {
+					let newListOptions = [...options];
+
+					if (multiple && selectedItems.length > 0) {
+						const items = [];
+						selectedItems.map(val => {
+							let item = null;
+							newListOptions.filter((f, i) => {
+								if (f.value === val) item = { data: f, index: i };
+							});
+							if (item) items.push(item);
+						});
+
+						items.map(s => newListOptions.splice(s.index, 1));
+						items.reverse().map(s => newListOptions.splice(0, 0, s.data));
+					}
+
 					return setListOptions(
 						listComponentLimit === 'All'
-							? options
+							? uniq([...newListOptions])
 							: uniq([
 									...(value ? options.filter(d => value.includes(d.value)) : []),
 									...options.slice(0, listComponentLimit)
 							  ])
 					);
+				}
 
 				const newOptions = options.filter(d => d.label.match(new RegExp(val, 'i')));
 				setListOptions(newOptions);
 			}, 500);
 		},
-		[JSON.stringify(options), JSON.stringify(listOptions)]
+		[JSON.stringify(options), JSON.stringify(listOptions), JSON.stringify(allSelectedValues)]
 	);
 
 	useEffect(() => {
-		handleSearch();
-	}, [JSON.stringify(options)]);
+		let newListOptions = [...options];
+		if (searchKey !== '') newListOptions = options.filter(d => d.label.match(new RegExp(searchKey, 'i')));
+
+		const selectedItems = multiple ? allSelectedValues : [];
+
+		if (multiple && selectedItems.length > 0) {
+			const items = [];
+			selectedItems.map(val => {
+				let item = null;
+				newListOptions.filter((f, i) => {
+					if (f.value === val) item = { data: f, index: i };
+				});
+				if (item) items.push(item);
+			});
+
+			items.map(s => newListOptions.splice(s.index, 1));
+			items.reverse().map(s => newListOptions.splice(0, 0, s.data));
+		}
+
+		setListOptions(uniq(newListOptions));
+	}, [JSON.stringify(allSelectedValues)]);
+
+	useEffect(() => {
+		if (multiple && value.length > 0 && allSelectedValues.length === 0) setAllSelectedValues(value);
+	}, [JSON.stringify(value)]);
 
 	const renderSelect = () => {
 		return (
@@ -116,7 +161,7 @@ const InputReference = ({
 							renderItem={(d, index) => (
 								<List.Item style={{ paddingTop: 3, paddingBottom: 3 }}>
 									<Checkbox
-										disabled={disabled}
+										// disabled={disabled}
 										className="table-font-size"
 										disabled={
 											disabledItems ? (disabledItems.includes(d.value) ? true : false) : false
@@ -148,11 +193,9 @@ const InputReference = ({
 														listOptions[0]
 													];
 												} else {
-													if (checked) {
-														const selectedItem = listOptions[index];
-														listOptions.splice(index, 1);
-														listOptions.splice(0, 0, selectedItem);
-													}
+													if (checked) setAllSelectedValues(sv => uniq([d.value, ...sv]));
+													else
+														setAllSelectedValues(sv => uniq(sv.filter(f => f !== d.value)));
 												}
 											}
 										}}
