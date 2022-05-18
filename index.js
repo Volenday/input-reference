@@ -27,6 +27,7 @@ const InputReference = ({
 	onChange,
 	onClear,
 	placeholder = '',
+	renderOnSearch = false,
 	required = false,
 	showManageButton = false,
 	toolTip = '',
@@ -39,6 +40,7 @@ const InputReference = ({
 	const [listOptions, setListOptions] = useState([]);
 	const [isDrawerVisible, setIsDrawerVisible] = useState(false);
 	let timeout = useRef(null);
+	const [ isListOpen, setIsListOpen] = useState(!renderOnSearch);
 
 	const handleSearch = useCallback(
 		(val = '') => {
@@ -94,7 +96,7 @@ const InputReference = ({
 		const height = dynamicHeight ? 'auto' : 234;
 
 		return (
-			<div className="listComponentWrapper">
+			<div className="listComponentWrapper" onPointerLeave={() => setIsListOpen(false)}>
 				<Row gutter={4}>
 					{allowSearch && (
 						<Col span={24} style={{ paddingRight: '0px !important' }}>
@@ -104,10 +106,11 @@ const InputReference = ({
 								placeholder="Search.."
 								onSearch={e => handleSearch(e)}
 								onKeyUp={e => handleSearch(e.target.value)}
+								onFocus={() => setIsListOpen(true)}
 							/>
 						</Col>
 					)}
-					<Col span={24} className="listWrapper" style={{ height }}>
+					{ isListOpen && <Col span={24} className="listWrapper" style={{ height }}>
 						<List
 							dataSource={listOptions}
 							disabled={disabled}
@@ -165,7 +168,7 @@ const InputReference = ({
 							rowKey={e => `${id}-${e.value}`}
 							size="small"
 						/>
-					</Col>
+					</Col>}
 				</Row>
 			</div>
 		);
